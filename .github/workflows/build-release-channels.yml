@@ -1,0 +1,39 @@
+name: Build release channels
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-release-channels:
+    if: github.repository == 'opf/nextcloud-integration-openproject-builds'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: build-release-channels
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq rsync gh
+
+      - name: Build and publish release channels
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: bash ./.github/scripts/build-release-channels.sh
