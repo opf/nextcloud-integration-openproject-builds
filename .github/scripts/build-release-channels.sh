@@ -94,6 +94,9 @@ process_branch() {
 
   mkdir -p "$stage_dir/integration_openproject"
 
+  # customize version string so people know what is deployed exactly
+  sed -i "s/<\/version>/ $sha7<\/version>/" $work_dir/appinfo/info.xml
+
   rsync -a \
     --exclude '.git' \
     --exclude '.github' \
